@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const initialTeams = [
   "Troublemakers", "Technocrats", "Auction Kings", "Stravon", "Innovators", 
@@ -29,7 +29,11 @@ const lists = {
 };
 
 export default function App() {
-  const [teams, setTeams] = useState(initialTeams);
+  const [teams, setTeams] = useState(() => {
+    const savedTeams = localStorage.getItem("auctionTeams");
+    return savedTeams ? JSON.parse(savedTeams) : initialTeams;
+  });
+
   const [currentList, setCurrentList] = useState("list1");
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [bidAmounts, setBidAmounts] = useState(Array(15).fill(0));
@@ -37,6 +41,11 @@ export default function App() {
   const [history, setHistory] = useState([]);
 
   const auctionItems = lists[currentList];
+
+  // Save to localStorage whenever teams change
+  useEffect(() => {
+    localStorage.setItem("auctionTeams", JSON.stringify(teams));
+  }, [teams]);
 
   const handleBid = (teamIndex) => {
     const bidAmount = parseInt(bidAmounts[teamIndex], 10);
